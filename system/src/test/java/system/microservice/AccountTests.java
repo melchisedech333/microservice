@@ -1,5 +1,5 @@
 
-package system.microservice.domain.entity;
+package system.microservice;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.DisplayName;
@@ -9,11 +9,13 @@ import system.microservice.domain.entity.Account;
 
 class AccountTests {
 
+	private Account account;
+
 	@Test
 	@DisplayName("Cria uma nova conta.")
 	public void testCreateNewAccount() {
-		Account account = new Account("111.222.333-44");
-		assertEquals(true, account.getAccountStatus());
+		this.account = new Account("111.222.333-44");
+		assertEquals(true, this.account.getAccountStatus());
 	}
 
 }
