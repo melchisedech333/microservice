@@ -3,6 +3,12 @@
 
 ## Etapas
 
+Executar testes.
+
+```
+./mvnw test
+```
+
 Gerar pacote do Microservice.
 
 ```

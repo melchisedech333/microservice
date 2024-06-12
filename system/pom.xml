@@ -32,7 +32,33 @@
                         <name>${module.image.name}</name>
                     </image>
                 </configuration>
+			</plugin>
 
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-surefire-plugin</artifactId>
+				<version>3.2.5</version>
+				<dependencies>
+					<dependency>
+						<groupId>me.fabriciorby</groupId>
+						<artifactId>maven-surefire-junit5-tree-reporter</artifactId>
+						<version>1.2.1</version>
+					</dependency>
+				</dependencies>
+				<configuration>
+					<argLine>-Xshare:off</argLine>
+					<parallel>all</parallel>
+					<reportFormat>plain</reportFormat>
+					<consoleOutputReporter>
+					<disable>true</disable>
+					</consoleOutputReporter>
+					<statelessTestsetInfoReporter implementation="org.apache.maven.plugin.surefire.extensions.junit5.JUnit5StatelessTestsetInfoTreeReporter">
+					<disable>false</disable>
+					<usePhrasedFileName>false</usePhrasedFileName>
+					<usePhrasedClassNameInRunning>true</usePhrasedClassNameInRunning>
+					<usePhrasedClassNameInTestCaseSummary>true</usePhrasedClassNameInTestCaseSummary>
+					</statelessTestsetInfoReporter>
+				</configuration>
 			</plugin>
 		</plugins>
 	</build>
