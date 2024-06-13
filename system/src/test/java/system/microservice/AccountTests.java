@@ -5,22 +5,31 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.DisplayName;
 import static org.junit.jupiter.api.Assertions.*;
 
+import system.microservice.application.service.AccountApplicationService;
 import system.microservice.domain.entity.Account;
+import system.microservice.infrastructure.queue.Publisher;
+import system.microservice.infrastructure.repository.AccountRepositoryMemory;
 
 class AccountTests {
 
+	private AccountApplicationService service;
+
+	public AccountTests() {
+		Publisher publisher = new Publisher();
+		AccountRepositoryMemory accountRepositoryMemory = new AccountRepositoryMemory();
+		this.service = new AccountApplicationService(publisher, accountRepositoryMemory);
+	}
+
 	@Test
 	@DisplayName("Cria uma nova conta.")
-	public void testCreateNewAccount() {
-		Account account = new Account("111.222.333-44");
-		assertTrue(account.getAccountStatus());
-	}
+	public void createAccount() {
+		this.service.create(
+			"111.111.111-11", 
+			"123", 
+			"1234", 
+			"12345-0");
 
-	@Test
-	@DisplayName("Verifica balance da conta recém criada.")
-	public void testCheckBalanceNewAccount() {
-		Account account = new Account("111.222.333-44");
+		Account account = this.service.get("111.111.111-11");
 		assertEquals(0, account.getBalance());
 	}
-
 }
