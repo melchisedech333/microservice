@@ -27,7 +27,7 @@ class AccountTests {
 	}
 
 	@Test
-    @Order(1)
+	@Order(1)
 	@DisplayName("Integration: cria uma nova conta.")
 	public void createAccount() {
 		this.service.create(
@@ -47,7 +47,7 @@ class AccountTests {
 	}
 
 	@Test
-    @Order(2)
+	@Order(2)
 	@DisplayName("Integration: retorna informações da conta.")
 	public void getAccountInformations() {
 		Account account = this.service.get("111.111.111-11");
