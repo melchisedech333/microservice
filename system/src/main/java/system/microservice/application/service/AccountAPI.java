@@ -40,7 +40,7 @@ public class AccountAPI {
 
     @GetMapping("/informations/{document}")
     public String informations(@PathVariable String document) {
-		Account account = this.service.get(document);
+        Account account = this.service.get(document);
 		
         if (account != null) {
             return "<pre>"+ account.getAccountInformations() +"</pre>";
