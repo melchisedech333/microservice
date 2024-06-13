@@ -37,12 +37,12 @@ class AccountTests {
 			"12345-0");
 
 		Account account = this.service.get("111.111.111-11");
-		assertEquals(0, account.getBalance());
+		assertTrue(account.getAccountStatus());
 		
 		if (account != null) {
 			this.log.save(
 				"Account created!\n"+
-				"Account balance: "+ account.getBalance());
+				"Account status: "+ account.getAccountStatus());
 		}
 	}
 
