@@ -1,33 +1,33 @@
 
 package system.microservice.application.service;
 
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.PathVariable;
 
 import system.microservice.domain.entity.Account;
 import system.microservice.infrastructure.queue.Publisher;
-import system.microservice.infrastructure.repository.AccountRepositoryMemory;
+import system.microservice.infrastructure.repository.AccountRepositoryDatabase;
 
 @RestController
 public class AccountAPI {
-    
 	private AccountApplicationService service;
 
 	public AccountAPI() {
 		Publisher publisher = new Publisher();
-		AccountRepositoryMemory accountRepositoryMemory = new AccountRepositoryMemory();
-		this.service = new AccountApplicationService(publisher, accountRepositoryMemory);
+		AccountRepositoryDatabase accountRepository = new AccountRepositoryDatabase();
+		this.service = new AccountApplicationService(publisher, accountRepository);
 	}
 
-    @RequestMapping("/create")
-    public String create() {
-		this.service.create(
-			"111.111.111-11", 
-			"123", 
-			"1234", 
-			"12345-0");
-
-		Account account = this.service.get("111.111.111-11");
+    @GetMapping("/create/{document}/{bank}/{branch}/{accountNumber}")
+    public String create(
+        @PathVariable String document,
+        @PathVariable String bank,
+        @PathVariable String branch,
+        @PathVariable String accountNumber)
+    {
+		this.service.create(document, bank, branch, accountNumber);
+		Account account = this.service.get(document);
 		
         if (account != null) {
             if (account.getAccountStatus()) {
@@ -38,9 +38,9 @@ public class AccountAPI {
         return "Error creating account.";
     }
 
-    @RequestMapping("/informations")
-    public String informations() {
-		Account account = this.service.get("111.111.111-11");
+    @GetMapping("/informations/{document}")
+    public String informations(@PathVariable String document) {
+		Account account = this.service.get(document);
 		
         if (account != null) {
             return "<pre>"+ account.getAccountInformations() +"</pre>";

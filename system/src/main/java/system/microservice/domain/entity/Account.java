@@ -32,6 +32,26 @@ public class Account {
         return this.document;
     }
 
+    public String getBank() {
+        return this.bank;
+    }
+
+    public String getBranch() {
+        return this.branch;
+    }
+
+    public String getAccount() {
+        return this.account;
+    }
+
+    public void setAccountStatus(boolean accountStatus) {
+        this.accountStatus = accountStatus;
+    }
+
+    public void setBalance(int accountBalance) {
+        this.accountBalance = accountBalance;
+    }
+
     public String getAccountInformations() {
         return 
             "Document: "+ this.document +"\n"+

@@ -28,10 +28,10 @@
 				<artifactId>spring-boot-maven-plugin</artifactId>
 				
 				<configuration>
-                    <image>
-                        <name>${module.image.name}</name>
-                    </image>
-                </configuration>
+					<image>
+						<name>${module.image.name}</name>
+					</image>
+				</configuration>
 			</plugin>
 
 			<plugin>
@@ -50,13 +50,24 @@
 					<parallel>all</parallel>
 					<reportFormat>plain</reportFormat>
 					<consoleOutputReporter>
-					<disable>true</disable>
+						<disable>true</disable>
 					</consoleOutputReporter>
 					<statelessTestsetInfoReporter implementation="org.apache.maven.plugin.surefire.extensions.junit5.JUnit5StatelessTestsetInfoTreeReporter">
-					<disable>false</disable>
-					<usePhrasedFileName>false</usePhrasedFileName>
-					<usePhrasedClassNameInRunning>true</usePhrasedClassNameInRunning>
-					<usePhrasedClassNameInTestCaseSummary>true</usePhrasedClassNameInTestCaseSummary>
+
+						<disable>false</disable>
+						<usePhrasedFileName>false</usePhrasedFileName>
+						<usePhrasedClassNameInRunning>true</usePhrasedClassNameInRunning>
+						<usePhrasedClassNameInTestCaseSummary>true</usePhrasedClassNameInTestCaseSummary>
+
+						<printStacktraceOnError>true</printStacktraceOnError>
+						<printStacktraceOnFailure>true</printStacktraceOnFailure>
+						<printStdoutOnError>true</printStdoutOnError>
+						<printStderrOnError>true</printStderrOnError>
+						<printStdoutOnFailure>true</printStdoutOnFailure>
+						<printStderrOnFailure>true</printStderrOnFailure>
+						<printStdoutOnSuccess>false</printStdoutOnSuccess>
+						<printStderrOnSuccess>false</printStderrOnSuccess>
+
 					</statelessTestsetInfoReporter>
 				</configuration>
 			</plugin>
@@ -73,6 +84,12 @@
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-test</artifactId>
 			<scope>test</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>org.xerial</groupId>
+			<artifactId>sqlite-jdbc</artifactId>
+			<version>3.46.0.0</version>
 		</dependency>
 	</dependencies>
 
