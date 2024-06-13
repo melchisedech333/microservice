@@ -11,13 +11,13 @@ import system.microservice.infrastructure.repository.AccountRepositoryDatabase;
 
 @RestController
 public class AccountAPI {
-	private AccountApplicationService service;
+    private AccountApplicationService service;
 
-	public AccountAPI() {
-		Publisher publisher = new Publisher();
-		AccountRepositoryDatabase accountRepository = new AccountRepositoryDatabase();
-		this.service = new AccountApplicationService(publisher, accountRepository);
-	}
+    public AccountAPI() {
+        Publisher publisher = new Publisher();
+        AccountRepositoryDatabase accountRepository = new AccountRepositoryDatabase();
+        this.service = new AccountApplicationService(publisher, accountRepository);
+    }
 
     @GetMapping("/create/{document}/{bank}/{branch}/{accountNumber}")
     public String create(
