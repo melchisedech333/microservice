@@ -26,9 +26,9 @@ public class AccountAPI {
         @PathVariable String branch,
         @PathVariable String accountNumber)
     {
-		this.service.create(document, bank, branch, accountNumber);
-		Account account = this.service.get(document);
-		
+        this.service.create(document, bank, branch, accountNumber);
+        Account account = this.service.get(document);
+
         if (account != null) {
             if (account.getAccountStatus()) {
                 return "Account created.";
