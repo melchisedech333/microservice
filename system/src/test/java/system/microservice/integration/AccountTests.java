@@ -12,6 +12,7 @@ import system.microservice.application.service.AccountApplicationService;
 import system.microservice.domain.entity.Account;
 import system.microservice.domain.handler.CreditHandler;
 import system.microservice.domain.handler.DebitHandler;
+import system.microservice.domain.handler.TransferHandler;
 import system.microservice.infrastructure.queue.Publisher;
 import system.microservice.infrastructure.repository.AccountRepositoryDatabase;
 import system.microservice.library.*;
@@ -28,6 +29,7 @@ class AccountTests {
 
 		publisher.register(new CreditHandler(accountRepository));
 		publisher.register(new DebitHandler(accountRepository));
+		publisher.register(new TransferHandler(accountRepository));
 
 		this.service = new AccountApplicationService(publisher, accountRepository);
 	}
@@ -102,6 +104,56 @@ class AccountTests {
 		if (account != null) {
 			String informations = account.getAccountInformations();
 			this.log.save(informations);
+		}
+	}
+
+	@Test
+	@Order(6)
+	@DisplayName("Integration: transferência entre contas.")
+	public void transferCash() {
+
+		// Create accounts.
+		this.service.create(
+			"333.333.333-33", 
+			"123", 
+			"1234", 
+			"12345-0");
+
+		this.service.create(
+			"444.444.444-44", 
+			"123", 
+			"1234", 
+			"12345-0");
+
+		// Credit cash.
+		this.service.credit("333.333.333-33", 1000);
+		this.service.credit("444.444.444-44", 1000);
+
+		// Transfer cash.
+		this.service.transfer(
+			"333.333.333-33", 
+			"444.444.444-44", 
+			300
+		);
+
+		// Get accounts.
+		Account accountFrom = this.service.get("333.333.333-33");
+		Account accountTo = this.service.get("444.444.444-44");
+
+		if (accountFrom != null && accountTo != null) {
+
+			// Check balance.
+			assertEquals(700, accountFrom.getBalance());
+			assertEquals(1300, accountTo.getBalance());
+
+			// Get informations.
+			String informationsFrom = accountFrom.getAccountInformations();
+			String informationsTo = accountTo.getAccountInformations();
+			
+			this.log.save(
+				"-> Account From: \n"+ informationsFrom +"\n\n"+
+				"-> Account To: \n"+ informationsTo
+			);
 		}
 	}
 }

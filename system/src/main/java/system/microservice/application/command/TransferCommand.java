@@ -1,13 +1,15 @@
 
 package system.microservice.application.command;
 
-public class DebitCommand implements Command {
-    private String operation = "debit";
-    private String document = "";
+public class TransferCommand implements Command {
+    private String operation = "transfer";
+    private String documentFrom = "";
+    private String documentTo = "";
     private int amount = 0;
 
-    public DebitCommand(String document, int amount) {
-        this.document = document;
+    public TransferCommand(String documentFrom, String documentTo, int amount) {
+        this.documentFrom = documentFrom;
+        this.documentTo = documentTo;
         this.amount = amount;
     }
 
@@ -18,17 +20,17 @@ public class DebitCommand implements Command {
 
     @Override    
     public String getDocument() {
-        return this.document;
+        return null;
     }
 
     @Override    
     public String getDocumentFrom() {
-        return null;
+        return this.documentFrom;
     }
 
     @Override    
     public String getDocumentTo() {
-        return null;
+        return this.documentTo;
     }
 
     @Override    

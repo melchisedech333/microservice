@@ -145,4 +145,86 @@ public class AccountAPITests {
 
         this.log.save(resultInformations.andReturn().getResponse().getContentAsString());
     }
+
+    @Test
+    @Order(6)
+    @DisplayName("Web API: transferência entre contas.")
+    public void transferCash() throws Exception 
+    {
+        ResultActions result;
+
+        // Create accounts.
+        result = this.mvc.perform(MockMvcRequestBuilders
+            .get("/create/555.555.555-55/123/1234/12345-0")
+            .accept(MediaType.ALL))
+        .andDo(print())
+        .andExpect(status().isOk())
+        .andExpect(content().string(containsString(
+            "Account created.")));
+
+        this.log.save(result.andReturn().getResponse().getContentAsString());
+
+        result = this.mvc.perform(MockMvcRequestBuilders
+            .get("/create/666.666.666-66/123/1234/12345-0")
+            .accept(MediaType.ALL))
+        .andDo(print())
+        .andExpect(status().isOk())
+        .andExpect(content().string(containsString(
+            "Account created.")));
+
+        this.log.save(result.andReturn().getResponse().getContentAsString());
+
+        // Credit cash.
+        result = this.mvc.perform(MockMvcRequestBuilders
+                .get("/credit/555.555.555-55/1000")
+                .accept(MediaType.ALL))
+            .andDo(print())
+            .andExpect(status().isOk())
+            .andExpect(content().string(containsString(
+                "Credit operation received.")));
+
+        this.log.save(result.andReturn().getResponse().getContentAsString());
+
+        result = this.mvc.perform(MockMvcRequestBuilders
+                .get("/credit/666.666.666-66/1000")
+                .accept(MediaType.ALL))
+            .andDo(print())
+            .andExpect(status().isOk())
+            .andExpect(content().string(containsString(
+                "Credit operation received.")));
+
+        this.log.save(result.andReturn().getResponse().getContentAsString());
+
+        // Transfer cash.
+        result = this.mvc.perform(MockMvcRequestBuilders
+                .get("/transfer/555.555.555-55/666.666.666-66/250")
+                .accept(MediaType.ALL))
+            .andDo(print())
+            .andExpect(status().isOk())
+            .andExpect(content().string(containsString(
+                "Transfer operation received.")));
+
+        this.log.save(result.andReturn().getResponse().getContentAsString());
+
+        // Check balance.
+        result = this.mvc.perform(MockMvcRequestBuilders
+                .get("/informations/555.555.555-55")
+                .accept(MediaType.ALL))
+            .andDo(print())
+            .andExpect(status().isOk())
+            .andExpect(content().string(containsString(
+                "Cash....: R$ 750")));
+
+        this.log.save(result.andReturn().getResponse().getContentAsString());
+
+        result = this.mvc.perform(MockMvcRequestBuilders
+                .get("/informations/666.666.666-66")
+                .accept(MediaType.ALL))
+            .andDo(print())
+            .andExpect(status().isOk())
+            .andExpect(content().string(containsString(
+                "Cash....: R$ 1250")));
+
+        this.log.save(result.andReturn().getResponse().getContentAsString());
+    }
 }

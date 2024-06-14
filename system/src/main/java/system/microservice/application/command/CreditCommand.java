@@ -22,6 +22,16 @@ public class CreditCommand implements Command {
     }
 
     @Override    
+    public String getDocumentFrom() {
+        return null;
+    }
+
+    @Override    
+    public String getDocumentTo() {
+        return null;
+    }
+
+    @Override    
     public int getAmount() {
         return this.amount;
     }
