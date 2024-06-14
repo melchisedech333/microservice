@@ -123,7 +123,7 @@ public class AccountAPITests {
     @DisplayName("Web API: dédito em conta (300).")
     public void deditCash() throws Exception 
     {
-        // Credit.
+        // Debit.
         ResultActions resultCredit = this.mvc.perform(MockMvcRequestBuilders
                 .get("/debit/222.222.222-22/300")
                 .accept(MediaType.ALL))
