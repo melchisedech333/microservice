@@ -6,6 +6,7 @@ import system.microservice.domain.builder.AccountBuilder;
 import system.microservice.domain.entity.Account;
 import system.microservice.infrastructure.queue.Publisher;
 import system.microservice.application.command.CreditCommand;
+import system.microservice.application.command.DebitCommand;
 
 public class AccountApplicationService {
     private Publisher publisher;
@@ -34,5 +35,10 @@ public class AccountApplicationService {
     public void credit(String document, int amount) {
         CreditCommand creditCommand = new CreditCommand(document, amount);
         this.publisher.publish(creditCommand);
+    }
+
+    public void debit(String document, int amount) {
+        DebitCommand debitCommand = new DebitCommand(document, amount);
+        this.publisher.publish(debitCommand);
     }
 }

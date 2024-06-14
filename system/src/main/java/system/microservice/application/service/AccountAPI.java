@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 
 import system.microservice.domain.entity.Account;
 import system.microservice.domain.handler.CreditHandler;
+import system.microservice.domain.handler.DebitHandler;
 import system.microservice.infrastructure.queue.Publisher;
 import system.microservice.infrastructure.repository.AccountRepositoryDatabase;
 
@@ -19,6 +20,8 @@ public class AccountAPI {
         AccountRepositoryDatabase accountRepository = new AccountRepositoryDatabase();
 
         publisher.register(new CreditHandler(accountRepository));
+        publisher.register(new DebitHandler(accountRepository));
+
         this.service = new AccountApplicationService(publisher, accountRepository);
     }
 
@@ -56,5 +59,11 @@ public class AccountAPI {
     public String credit(@PathVariable String document, @PathVariable int amount) {
         this.service.credit(document, amount);
 		return "Credit operation received.";
+    }
+
+    @GetMapping("/debit/{document}/{amount}")
+    public String debit(@PathVariable String document, @PathVariable int amount) {
+        this.service.debit(document, amount);
+		return "Debit operation received.";
     }
 }

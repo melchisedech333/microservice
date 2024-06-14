@@ -117,4 +117,32 @@ public class AccountAPITests {
 
         this.log.save(resultInformations.andReturn().getResponse().getContentAsString());
     }
+
+    @Test
+    @Order(5)
+    @DisplayName("Web API: dédito em conta (300).")
+    public void deditCash() throws Exception 
+    {
+        // Credit.
+        ResultActions resultCredit = this.mvc.perform(MockMvcRequestBuilders
+                .get("/debit/222.222.222-22/300")
+                .accept(MediaType.ALL))
+            .andDo(print())
+            .andExpect(status().isOk())
+            .andExpect(content().string(containsString(
+                "Debit operation received.")));
+
+        this.log.save(resultCredit.andReturn().getResponse().getContentAsString());
+
+        // Informations.
+        ResultActions resultInformations = this.mvc.perform(MockMvcRequestBuilders
+                .get("/informations/222.222.222-22")
+                .accept(MediaType.ALL))
+            .andDo(print())
+            .andExpect(status().isOk())
+            .andExpect(content().string(containsString(
+                "Cash....: R$ 250")));
+
+        this.log.save(resultInformations.andReturn().getResponse().getContentAsString());
+    }
 }

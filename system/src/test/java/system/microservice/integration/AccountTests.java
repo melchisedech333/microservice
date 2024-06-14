@@ -11,6 +11,7 @@ import org.junit.jupiter.api.Order;
 import system.microservice.application.service.AccountApplicationService;
 import system.microservice.domain.entity.Account;
 import system.microservice.domain.handler.CreditHandler;
+import system.microservice.domain.handler.DebitHandler;
 import system.microservice.infrastructure.queue.Publisher;
 import system.microservice.infrastructure.repository.AccountRepositoryDatabase;
 import system.microservice.library.*;
@@ -26,6 +27,8 @@ class AccountTests {
 		AccountRepositoryDatabase accountRepository = new AccountRepositoryDatabase();
 
 		publisher.register(new CreditHandler(accountRepository));
+		publisher.register(new DebitHandler(accountRepository));
+
 		this.service = new AccountApplicationService(publisher, accountRepository);
 	}
 
@@ -81,6 +84,20 @@ class AccountTests {
 		this.service.credit("111.111.111-11", 200);
 		Account account = this.service.get("111.111.111-11");
 		assertEquals(1700, account.getBalance());
+		
+		if (account != null) {
+			String informations = account.getAccountInformations();
+			this.log.save(informations);
+		}
+	}
+
+	@Test
+	@Order(5)
+	@DisplayName("Integration: dédito em conta (menos 300).")
+	public void deditCash() {
+		this.service.debit("111.111.111-11", 300);
+		Account account = this.service.get("111.111.111-11");
+		assertEquals(1400, account.getBalance());
 		
 		if (account != null) {
 			String informations = account.getAccountInformations();

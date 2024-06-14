@@ -65,7 +65,7 @@ public class Account {
         this.accountBalance += amount;
     }
 
-    public void dedit(int amount) {
+    public void debit(int amount) {
         this.accountBalance -= amount;
     }
 }
