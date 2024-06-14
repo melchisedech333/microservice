@@ -6,6 +6,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.PathVariable;
 
 import system.microservice.domain.entity.Account;
+import system.microservice.domain.handler.CreditHandler;
 import system.microservice.infrastructure.queue.Publisher;
 import system.microservice.infrastructure.repository.AccountRepositoryDatabase;
 
@@ -16,6 +17,8 @@ public class AccountAPI {
     public AccountAPI() {
         Publisher publisher = new Publisher();
         AccountRepositoryDatabase accountRepository = new AccountRepositoryDatabase();
+
+        publisher.register(new CreditHandler(accountRepository));
         this.service = new AccountApplicationService(publisher, accountRepository);
     }
 
@@ -47,5 +50,11 @@ public class AccountAPI {
         }
 
         return "Account not found.";
+    }
+
+    @GetMapping("/credit/{document}/{amount}")
+    public String credit(@PathVariable String document, @PathVariable int amount) {
+        this.service.credit(document, amount);
+		return "Credit operation received.";
     }
 }

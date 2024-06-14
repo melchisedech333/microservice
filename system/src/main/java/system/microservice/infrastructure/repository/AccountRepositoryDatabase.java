@@ -13,11 +13,13 @@ import system.microservice.domain.entity.Account;
 import system.microservice.domain.repository.AccountRepository;
 
 public class AccountRepositoryDatabase implements AccountRepository {
-
-    private String databaseURL = "jdbc:sqlite:database.db";
+    private String databaseURL = "jdbc:mysql://localhost:3306/microservice?serverTimezone=UTC";
+    private String databaseUser = "user"; // Local database testing account.
+    private String databasePass = "123";  // Local database testing account.
     private Connection connection = null;
 
     public AccountRepositoryDatabase() {
+
         if (!this.connectDatabase()) {
             System.out.println("Error connect database.");
             System.exit(1);
@@ -28,16 +30,17 @@ public class AccountRepositoryDatabase implements AccountRepository {
 
     private boolean connectDatabase() {
         try {
-            this.connection = DriverManager.getConnection(this.databaseURL);
+            this.connection = DriverManager.getConnection(
+                this.databaseURL, this.databaseUser, this.databasePass);
         } catch (SQLException e) {
-            System.out.println(e.getMessage());
+            System.err.println("connectDatabase(): "+ e.getMessage());
             
             try {
                 if (this.connection != null) {
                     this.connection.close();
                 }
             } catch (SQLException ex) {
-                System.out.println(ex.getMessage());
+                System.err.println("connectDatabase() exception: "+ ex.getMessage());
             }
 
             return false;
@@ -48,36 +51,42 @@ public class AccountRepositoryDatabase implements AccountRepository {
 
     private void prepareTables() {
         String sql = 
-            "CREATE TABLE IF NOT EXISTS accounts ( "+
-            "   id       integer PRIMARY KEY,      "+
-            "   document text    NOT NULL,         "+
-            "   bank     text    NOT NULL,         "+
-            "   branch   text    NOT NULL,         "+
-            "   account  text    NOT NULL,         "+
-            "   status   integer DEFAULT 0,        "+
-            "   balance  integer DEFAULT 0         "+
+            "CREATE TABLE IF NOT EXISTS accounts (           "+
+            "   id       integer PRIMARY KEY AUTO_INCREMENT, "+
+            "   document text    NOT NULL,                   "+
+            "   bank     text    NOT NULL,                   "+
+            "   branch   text    NOT NULL,                   "+
+            "   account  text    NOT NULL,                   "+
+            "   status   integer DEFAULT 0,                  "+
+            "   balance  integer DEFAULT 0                   "+
             ");";
         
         try {
-            this.connection = DriverManager.getConnection(this.databaseURL);
             Statement stmt = this.connection.createStatement();
             stmt.execute(sql);
+            stmt.close();
         } catch (SQLException e) {
-            System.out.println(e.getMessage());
+            System.out.println("prepareTables(): "+ e.getMessage());
             System.exit(1);
         }
     }
 
+    @Override
     public void save(Account account) {
         if (this.checkAccountExists(account.getDocument())) {
-            return;
+            this.updateAccount(account);
+        } else {
+            this.createNewAccount(account);
         }
+    }
 
+    private void createNewAccount(Account account) {
         String sql = 
             "INSERT INTO accounts (document, bank, branch, account, status, balance) "+
             "VALUES (?,?,?,?,?,?);";
 
         int accountStatus = 0;
+
         if (account.getAccountStatus()) {
             accountStatus = 1;
         }
@@ -92,14 +101,15 @@ public class AccountRepositoryDatabase implements AccountRepository {
             pstmt.setInt(5, accountStatus);
             pstmt.setInt(6, account.getBalance());
             pstmt.executeUpdate();
+            pstmt.close();
         } catch (SQLException e) {
-            System.out.println(e.getMessage());
+            System.out.println("createNewAccount(): "+ e.getMessage());
         }
     }
     
     public boolean checkAccountExists(String document) {
         String sql = "SELECT * FROM accounts WHERE document = '"+ document +"'";
-
+        
         try {
             Statement stmt = this.connection.createStatement();
             ResultSet rs = stmt.executeQuery(sql);
@@ -109,13 +119,42 @@ public class AccountRepositoryDatabase implements AccountRepository {
                     return true;
                 }
             }
+
+            rs.close();
         } catch (SQLException e) {
-            System.out.println(e.getMessage());
+            System.out.println("checkAccountExists(): "+ e.getMessage());
         }
 
         return false;
     }
 
+    public void updateAccount(Account account) {
+        String sql = 
+            "UPDATE accounts SET bank = ? , "+
+            "branch = ? , account = ? , status = ? , balance = ? "+
+            "WHERE document = ? ;";
+
+        int accountStatus = 0;
+        if (account.getAccountStatus()) {
+            accountStatus = 1;
+        }
+
+        try {
+            PreparedStatement pstmt = this.connection.prepareStatement(sql);
+
+            pstmt.setString(1, account.getBank());
+            pstmt.setString(2, account.getBranch());
+            pstmt.setString(3, account.getAccount());
+            pstmt.setInt(4, accountStatus);
+            pstmt.setInt(5, account.getBalance());
+            pstmt.setString(6, account.getDocument());
+            pstmt.executeUpdate();
+        } catch (SQLException e) {
+            System.out.println("updateAccount(): "+ e.getMessage());
+        }
+    }
+
+    @Override
     public Account get(String document) {
         String sql = "SELECT * FROM accounts WHERE document = '"+ document +"'";
         AccountBuilder accountBuilder = new AccountBuilder(document);
@@ -144,8 +183,11 @@ public class AccountRepositoryDatabase implements AccountRepository {
                     return account;
                 }
             }
+
+            rs.close();
+            stmt.close();
         } catch (SQLException e) {
-            System.out.println(e.getMessage());
+            System.out.println("get(): "+ e.getMessage());
         }
 
         return null;

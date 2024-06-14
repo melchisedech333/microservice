@@ -10,6 +10,7 @@ import org.junit.jupiter.api.Order;
 
 import system.microservice.application.service.AccountApplicationService;
 import system.microservice.domain.entity.Account;
+import system.microservice.domain.handler.CreditHandler;
 import system.microservice.infrastructure.queue.Publisher;
 import system.microservice.infrastructure.repository.AccountRepositoryDatabase;
 import system.microservice.library.*;
@@ -23,6 +24,8 @@ class AccountTests {
 	public AccountTests() {
 		Publisher publisher = new Publisher();
 		AccountRepositoryDatabase accountRepository = new AccountRepositoryDatabase();
+
+		publisher.register(new CreditHandler(accountRepository));
 		this.service = new AccountApplicationService(publisher, accountRepository);
 	}
 
@@ -52,7 +55,36 @@ class AccountTests {
 	public void getAccountInformations() {
 		Account account = this.service.get("111.111.111-11");
 		String informations = account.getAccountInformations();
-		assertEquals(true, informations.contains("111.111.111-11"));
+		assertTrue(informations.contains("111.111.111-11"));
 		this.log.save(informations);
+	}
+
+	@Test
+	@Order(3)
+	@DisplayName("Integration: crédito em conta (mais 1000).")
+	public void creditCash() {
+		this.service.credit("111.111.111-11", 1000);
+		Account account = this.service.get("111.111.111-11");
+		assertEquals(1000, account.getBalance());
+		
+		if (account != null) {
+			String informations = account.getAccountInformations();
+			this.log.save(informations);
+		}
+	}
+
+	@Test
+	@Order(4)
+	@DisplayName("Integration: crédito em conta (mais 700).")
+	public void creditCashMore() {
+		this.service.credit("111.111.111-11", 500);
+		this.service.credit("111.111.111-11", 200);
+		Account account = this.service.get("111.111.111-11");
+		assertEquals(1700, account.getBalance());
+		
+		if (account != null) {
+			String informations = account.getAccountInformations();
+			this.log.save(informations);
+		}
 	}
 }

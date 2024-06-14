@@ -1,10 +1,11 @@
 
 package system.microservice.application.service;
 
-import system.microservice.infrastructure.queue.Publisher;
 import system.microservice.domain.repository.AccountRepository;
 import system.microservice.domain.builder.AccountBuilder;
 import system.microservice.domain.entity.Account;
+import system.microservice.infrastructure.queue.Publisher;
+import system.microservice.application.command.CreditCommand;
 
 public class AccountApplicationService {
     private Publisher publisher;
@@ -28,5 +29,10 @@ public class AccountApplicationService {
 
     public Account get(String document) {
         return this.accountRepository.get(document);
+    }
+
+    public void credit(String document, int amount) {
+        CreditCommand creditCommand = new CreditCommand(document, amount);
+        this.publisher.publish(creditCommand);
     }
 }

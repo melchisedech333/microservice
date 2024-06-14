@@ -57,14 +57,15 @@ public class Account {
             "Document: "+ this.document +"\n"+
             "Bank....: "+ this.bank +"\n"+
             "Branch..: "+ this.branch +"\n"+
-            "Account.: "+ this.account;
+            "Account.: "+ this.account +"\n"+
+            "Cash....: R$ "+ this.accountBalance;
     }
 
     public void credit(int amount) {
-
+        this.accountBalance += amount;
     }
 
     public void dedit(int amount) {
-        
+        this.accountBalance -= amount;
     }
 }
