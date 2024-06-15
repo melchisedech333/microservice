@@ -31,11 +31,11 @@ public class AccountAPITests {
     @Autowired
     private MockMvc mvc;
 
-	@BeforeAll
-	public static void prepareDatabase() {
-		PrepateDatabase prepateDatabase = new PrepateDatabase();
-		prepateDatabase.prepare();
-	}
+    @BeforeAll
+    public static void prepareDatabase() {
+        PrepateDatabase prepateDatabase = new PrepateDatabase();
+        prepateDatabase.prepare();
+    }
 
     @Test
     @Order(1)
