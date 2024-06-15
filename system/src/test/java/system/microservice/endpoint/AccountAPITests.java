@@ -8,6 +8,7 @@ import static org.hamcrest.Matchers.containsString;
 
 import org.junit.jupiter.api.TestMethodOrder;
 import org.junit.jupiter.api.MethodOrderer.OrderAnnotation;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
@@ -29,6 +30,12 @@ public class AccountAPITests {
 
     @Autowired
     private MockMvc mvc;
+
+	@BeforeAll
+	public static void prepareDatabase() {
+		PrepateDatabase prepateDatabase = new PrepateDatabase();
+		prepateDatabase.prepare();
+	}
 
     @Test
     @Order(1)

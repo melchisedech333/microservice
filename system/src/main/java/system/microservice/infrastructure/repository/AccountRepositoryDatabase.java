@@ -7,9 +7,11 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.ArrayList;
 
 import system.microservice.domain.builder.AccountBuilder;
 import system.microservice.domain.entity.Account;
+import system.microservice.domain.entity.Transaction;
 import system.microservice.domain.repository.AccountRepository;
 import system.microservice.infrastructure.configuration.Configuration;
 
@@ -59,23 +61,39 @@ public class AccountRepositoryDatabase implements AccountRepository {
     }
 
     private void prepareTables() {
-        String sql = 
-            "CREATE TABLE IF NOT EXISTS accounts (           "+
-            "   id       integer PRIMARY KEY AUTO_INCREMENT, "+
-            "   document text    NOT NULL,                   "+
-            "   bank     text    NOT NULL,                   "+
-            "   branch   text    NOT NULL,                   "+
-            "   account  text    NOT NULL,                   "+
-            "   status   integer DEFAULT 0,                  "+
-            "   balance  integer DEFAULT 0                   "+
+        String sqlAccounts = 
+            "CREATE TABLE IF NOT EXISTS accounts (            "+
+            "   id        integer PRIMARY KEY AUTO_INCREMENT, "+
+            "   document  text    NOT NULL,                   "+
+            "   bank      text    NOT NULL,                   "+
+            "   branch    text    NOT NULL,                   "+
+            "   account   text    NOT NULL,                   "+
+            "   status    integer DEFAULT 0                   "+
+            ");                                               ";
+
+        String sqlTransactions = 
+            "CREATE TABLE IF NOT EXISTS transactions (        "+
+            "   id        integer PRIMARY KEY AUTO_INCREMENT, "+
+            "   document  text    NOT NULL,                   "+
+            "   operation text    NOT NULL,                   "+
+            "   amount    integer DEFAULT 0                   "+
             ");";
-        
+
         try {
             Statement stmt = this.connection.createStatement();
-            stmt.execute(sql);
+            stmt.execute(sqlAccounts);
             stmt.close();
         } catch (SQLException e) {
-            System.out.println("prepareTables(): "+ e.getMessage());
+            System.out.println("prepareTables(): Accounts - "+ e.getMessage());
+            System.exit(1);
+        }
+
+        try {
+            Statement stmt = this.connection.createStatement();
+            stmt.execute(sqlTransactions);
+            stmt.close();
+        } catch (SQLException e) {
+            System.out.println("prepareTables(): Transactions - "+ e.getMessage());
             System.exit(1);
         }
     }
@@ -91,8 +109,8 @@ public class AccountRepositoryDatabase implements AccountRepository {
 
     private void createNewAccount(Account account) {
         String sql = 
-            "INSERT INTO accounts (document, bank, branch, account, status, balance) "+
-            "VALUES (?,?,?,?,?,?);";
+            "INSERT INTO accounts (document, bank, branch, account, status) "+
+            "VALUES (?,?,?,?,?);";
 
         int accountStatus = 0;
 
@@ -108,7 +126,6 @@ public class AccountRepositoryDatabase implements AccountRepository {
             pstmt.setString(3, account.getBranch());
             pstmt.setString(4, account.getAccount());
             pstmt.setInt(5, accountStatus);
-            pstmt.setInt(6, account.getBalance());
             pstmt.executeUpdate();
             pstmt.close();
         } catch (SQLException e) {
@@ -143,7 +160,7 @@ public class AccountRepositoryDatabase implements AccountRepository {
     public void updateAccount(Account account) {
         String sql = 
             "UPDATE accounts SET bank = ? , "+
-            "branch = ? , account = ? , status = ? , balance = ? "+
+            "branch = ? , account = ? , status = ? "+
             "WHERE document = ? ;";
 
         int accountStatus = 0;
@@ -158,8 +175,7 @@ public class AccountRepositoryDatabase implements AccountRepository {
             pstmt.setString(2, account.getBranch());
             pstmt.setString(3, account.getAccount());
             pstmt.setInt(4, accountStatus);
-            pstmt.setInt(5, account.getBalance());
-            pstmt.setString(6, account.getDocument());
+            pstmt.setString(5, account.getDocument());
             pstmt.executeUpdate();
             pstmt.close();
         } catch (SQLException e) {
@@ -191,7 +207,6 @@ public class AccountRepositoryDatabase implements AccountRepository {
                     }
                     
                     account.setAccountStatus(accountStatus);
-                    account.setBalance(rs.getInt("balance"));
 
                     rs.close();
                     stmt.close();
@@ -207,5 +222,55 @@ public class AccountRepositoryDatabase implements AccountRepository {
         }
 
         return null;
+    }
+
+    @Override
+    public void saveTransaction(Transaction transaction) {
+        String sql = 
+            "INSERT INTO transactions (document, operation, amount) VALUES (?,?,?);";
+
+        try {
+            PreparedStatement pstmt = this.connection.prepareStatement(sql);
+
+            pstmt.setString(1, transaction.getDocument());
+            pstmt.setString(2, transaction.getOperation());
+            pstmt.setInt(3, transaction.getAmount());
+            
+            pstmt.executeUpdate();
+            pstmt.close();
+        } catch (SQLException e) {
+            System.out.println("createNewAccount(): "+ e.getMessage());
+        }
+    }
+
+    @Override
+    public ArrayList<Transaction> getTransactions(String document) {
+        ArrayList<Transaction> transactions = new ArrayList<Transaction>();
+        String sql = "SELECT * FROM transactions WHERE document = '"+ document +"'";
+        
+        try {
+            Statement stmt = this.connection.createStatement();
+            ResultSet rs = stmt.executeQuery(sql);
+            
+            while (rs.next()) {
+                if (rs.getString("document").equals(document)) {
+                    
+                    transactions.add(
+                        new Transaction(
+                            rs.getString("document"),
+                            rs.getString("operation"),
+                            rs.getInt("amount")
+                        )
+                    );
+                }
+            }
+
+            rs.close();
+            stmt.close();
+        } catch (SQLException e) {
+            System.out.println("get(): "+ e.getMessage());
+        }
+
+        return transactions;
     }
 }

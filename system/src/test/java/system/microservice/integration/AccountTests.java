@@ -2,6 +2,8 @@
 package system.microservice.integration;
 
 import static org.junit.jupiter.api.Assertions.*;
+
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.TestMethodOrder;
@@ -32,6 +34,12 @@ class AccountTests {
 		publisher.register(new TransferHandler(accountRepository));
 
 		this.service = new AccountApplicationService(publisher, accountRepository);
+	}
+
+	@BeforeAll
+	public static void prepareDatabase() {
+		PrepateDatabase prepateDatabase = new PrepateDatabase();
+		prepateDatabase.prepare();
 	}
 
 	@Test
