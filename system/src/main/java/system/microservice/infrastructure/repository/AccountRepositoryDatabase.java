@@ -125,11 +125,14 @@ public class AccountRepositoryDatabase implements AccountRepository {
             
             while (rs.next()) {
                 if (rs.getString("document").equals(document)) {
+                    rs.close();
+                    stmt.close();
                     return true;
                 }
             }
 
             rs.close();
+            stmt.close();
         } catch (SQLException e) {
             System.out.println("checkAccountExists(): "+ e.getMessage());
         }
@@ -158,6 +161,7 @@ public class AccountRepositoryDatabase implements AccountRepository {
             pstmt.setInt(5, account.getBalance());
             pstmt.setString(6, account.getDocument());
             pstmt.executeUpdate();
+            pstmt.close();
         } catch (SQLException e) {
             System.out.println("updateAccount(): "+ e.getMessage());
         }
@@ -188,6 +192,9 @@ public class AccountRepositoryDatabase implements AccountRepository {
                     
                     account.setAccountStatus(accountStatus);
                     account.setBalance(rs.getInt("balance"));
+
+                    rs.close();
+                    stmt.close();
 
                     return account;
                 }
