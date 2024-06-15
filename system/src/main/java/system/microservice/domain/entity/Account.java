@@ -24,10 +24,6 @@ public class Account {
         return this.accountStatus;
     }
 
-    public int getBalance() {
-        return this.accountBalance;
-    }
-
     public String getDocument() {
         return this.document;
     }
@@ -48,10 +44,6 @@ public class Account {
         this.accountStatus = accountStatus;
     }
 
-    public void setBalance(int accountBalance) {
-        this.accountBalance = accountBalance;
-    }
-
     public String getAccountInformations() {
         return 
             "Document: "+ this.document +"\n"+
@@ -59,6 +51,14 @@ public class Account {
             "Branch..: "+ this.branch +"\n"+
             "Account.: "+ this.account +"\n"+
             "Cash....: R$ "+ this.accountBalance;
+    }
+
+    public void setBalance(int accountBalance) {
+        this.accountBalance = accountBalance;
+    }
+
+    public int getBalance() {
+        return this.accountBalance;
     }
 
     public void credit(int amount) {

@@ -11,14 +11,16 @@ import java.sql.Statement;
 import system.microservice.domain.builder.AccountBuilder;
 import system.microservice.domain.entity.Account;
 import system.microservice.domain.repository.AccountRepository;
+import system.microservice.infrastructure.configuration.Configuration;
 
 public class AccountRepositoryDatabase implements AccountRepository {
-    private String databaseURL = "jdbc:mysql://localhost:3306/microservice?serverTimezone=UTC";
-    private String databaseUser = "user"; // Local database testing account.
-    private String databasePass = "123";  // Local database testing account.
+    private String databaseURL = null;
+    private String databaseUser = null;
+    private String databasePass = null;
     private Connection connection = null;
 
     public AccountRepositoryDatabase() {
+        this.prepareConfigurations();
 
         if (!this.connectDatabase()) {
             System.out.println("Error connect database.");
@@ -26,6 +28,13 @@ public class AccountRepositoryDatabase implements AccountRepository {
         }
 
         this.prepareTables();
+    }
+
+    private void prepareConfigurations() {
+        Configuration configuration = new Configuration();
+        this.databaseURL = configuration.getDatabaseURL();
+        this.databaseUser = configuration.getDatabaseUser();
+        this.databasePass = configuration.getDatabasePass();
     }
 
     private boolean connectDatabase() {
